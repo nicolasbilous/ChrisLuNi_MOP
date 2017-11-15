@@ -117,7 +117,7 @@
 		    (object Dependency_Relationship
 			quid       	"5A0BF5C4020B"
 			stereotype 	"include"
-			supplier   	"Use Case View::Proposer ingrédients"
+			supplier   	"Use Case View::Sélectionner des ingrédients à proposer"
 			quidu      	"5A098C7600D5")
 		    (object Dependency_Relationship
 			quid       	"5A0BF5C8005A"
@@ -127,7 +127,7 @@
 		    (object Dependency_Relationship
 			quid       	"5A0BF5CB02B9"
 			stereotype 	"include"
-			supplier   	"Use Case View::Updater commandes"
+			supplier   	"Use Case View::Définir état commandes"
 			quidu      	"5A0992E600E4")))
 	    (object UseCase "Se connecter client"
 		quid       	"5A098BDB02B4"
@@ -171,9 +171,10 @@
 			quid       	"5A09B3EF0045"
 			supplier   	"Use Case View::Ajouter Produit"
 			quidu      	"5A09B3DB00A3")))
-	    (object UseCase "Proposer ingrédients"
+	    (object UseCase "Sélectionner des ingrédients à proposer"
 		quid       	"5A098C7600D5"
 		documentation 	
+|
 |Résumé: La pizzeria sélectionne des ingrédients disponibles pour la composition de pizzas personnalisées.
 |
 |Acteur primaire: La pizzeria.
@@ -203,6 +204,7 @@
 |La pizzeria souhaite retirer de sa liste un ou des ingrédients.
 |1.	La pizzeria retire de sa liste un ou des ingrédients, sans que ceux-ci ne soient pour autant supprimés de la BD.
 |2.	La pizzeria clique sur " valider ".
+|
 |
 		
 		visible_modules 	(list dependency_list
@@ -468,10 +470,11 @@
 			stereotype 	"include"
 			supplier   	"Use Case View::Se connecter pro"
 			quidu      	"5A098B670248")))
-	    (object UseCase "Updater commandes"
+	    (object UseCase "Définir état commandes"
 		quid       	"5A0992E600E4"
 		documentation 	
-|Résumé: La pizzeria consulte en temps réel les commandes qui lui sont passées.
+|
+|Résumé: La pizzeria update la liste des commandes qui lui sont passées.
 |
 |Acteur primaire: La pizzeria.
 |
@@ -479,17 +482,20 @@
 |
 |Pré-conditions: 
 |La pizzeria doit être connectée.
+|La liste des commandes en cours doit être affichée en permanence, avec un rafraîchissement régulier. Il doit recevoir les commandes dans l'ordre chronologique, sous forme de liste.
 |
 |Post-condition: -
 |
 |Contraintes techniques :
-|La liste des commandes en cours doit être affichée en permanence, avec un rafraîchissement régulier.
-|Il doit recevoir les commandes dans l'ordre chronologique, sous forme de liste.
-|La mise du statut de la commande entraine la mise jour du statut de la commande coté client (application web et/ou mobile).
-|Une commande indiquée comme disponible ou en cours de livraison est automatiquement retirée de la liste des commandes.
+|La mise à jour de l'état de la commande entraine la mise jour du statut de la commande coté client (application web et/ou mobile).
+|Une commande indiquée comme prête (au comptoir ou en livraison) est automatiquement retirée de la liste des commandes.
+|
 |
 |Scénario nominal:
-|1.	La pizzeria peut mettre à jour le statut des commandes et valider.
+|1.	La pizzeria coche la case correspondant à l'état d'une commande 
+|
+|Scénario d'extension 1.b: La commande est prête
+|1.	Le système demande à la pizzeria s'il c'est sur et la Pizzeria doit valider.
 |
 		
 		visible_modules 	(list dependency_list
@@ -682,6 +688,59 @@
 			quidu      	"5A098FEF0218")))
 	    (object UseCase "Gérer catalogue"
 		quid       	"5A0BF5710102"
+		documentation 	
+|
+|Résumé : La Pizzeria configure son catalogue : il ajouter, supprime, modifie des produits ou des ingrédients, et les prix associés.
+|
+|Acteur primaire : La Pizzeria
+|
+|Acteur secondaire : Aucun
+|
+|Pré-conditions : La Pizzeria est connectée. 
+|
+|Post-conditions : Le catalogue classique visible par le visiteur du site à été modifier. 
+|
+|Contraintes techniques: Interface simple et la plus intuitive possible. 
+|
+|Le scénario nominal du CU "Gérer catalogue " :
+|1.	La Pizzeria clique sur " gestion du catalogue ".
+|
+|Scénario d'extension 1.b: Ajouter un produit 
+|1.	La pizzeria clique sur ajouter un produit
+|2.	La pizzeria choisi le type du produit
+|3.	La Pizzeria renseigne le nom du produit
+|4.	La Pizzeria ajoute une photo du produit
+|5.	La Pizzeria entre un prix.
+|6.	La Pizzeria clique sur "Valider".
+|
+|Scénario d'extension 1.b-2b: Ajouter une pizza
+|1.	La Pizzeria sélectionne les ingrédients qui composent la pizza.
+|2.	Renvoi à l'étape 3 du scénario d'extension 1.b:
+|
+|Scénario d'extension 1.c: Supprimer un produit. 
+|Pré-conditions : Le produit doit être présent sur son catalogue.
+|Post-conditions : La pizzeria ne propose plus le produit en question (elle n'est plus visible pour le visiteur du site). 
+|1.	La pizzéria clique sur supprimer un produit
+|2.	La Pizzeria indique la catégorie du produit à supprimer
+|3.	La Pizzeria sélectionne un produit dans la liste des produits
+|4.	La Pizzeria clique sur supprimer.
+|
+|Scénario d'extension 1.d: Modifier un produit. 
+|Pré-conditions : Le produit doit être présent sur son catalogue.
+|Post-conditions : Un élément du produit à été modifié 
+|1.	La pizzéria clique sur modifier un produit
+|2.	La Pizzeria indique la catégorie du produit à modifier
+|3.	La Pizzeria sélectionne un produit dans la liste des produits
+|4.	La Pizzeria modifie le ou les éléments (e.g. prix, photo, description) à modifier
+|5.	La Pizzeria clique sur "Valider".
+|
+|Scénario d'extension 1.d.4.b: Modifier les ingrédients d'une pizza 
+|1.	La pizzeria clique sur liste d'ingrédient
+|2.	La pizzeria modifie un ou plusieurs ingrédients
+|3.	Renvoi vers l'étape 5 du scenario d'extension 1.d
+|
+|
+		
 		visible_modules 	(list dependency_list
 		    (object Dependency_Relationship
 			quid       	"5A0BF5A40299"
@@ -801,7 +860,7 @@
 		roles      	(list role_list
 		    (object Role "$UNNAMED$13"
 			quid       	"5A098CB7031E"
-			supplier   	"Use Case View::Proposer ingrédients"
+			supplier   	"Use Case View::Sélectionner des ingrédients à proposer"
 			quidu      	"5A098C7600D5"
 			is_navigable 	TRUE)
 		    (object Role "$UNNAMED$14"
@@ -921,7 +980,7 @@
 		roles      	(list role_list
 		    (object Role "$UNNAMED$43"
 			quid       	"5A09932A0336"
-			supplier   	"Use Case View::Updater commandes"
+			supplier   	"Use Case View::Définir état commandes"
 			quidu      	"5A0992E600E4"
 			is_navigable 	TRUE)
 		    (object Role "$UNNAMED$44"
@@ -1121,7 +1180,7 @@
 		max_height 	28350
 		max_width  	21600
 		origin_x   	0
-		origin_y   	321
+		origin_y   	0
 		items      	(list diagram_item_list
 		    (object UseCaseView "Use Case View::Modifier Quantités" @1
 			location   	(3342, 1224)
@@ -1220,7 +1279,7 @@
 			quidu      	"5A098B670248"
 			height     	118)
 		    (object UseCaseView "Use Case View::Ajouter Produit" @5
-			location   	(1080, 204)
+			location   	(1224, 300)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1232,7 +1291,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@5
-			    location   	(1080, 342)
+			    location   	(1224, 438)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -1244,7 +1303,7 @@
 			quidu      	"5A09B3DB00A3"
 			height     	118)
 		    (object UseCaseView "Use Case View::Supprimer Produit" @6
-			location   	(1776, 225)
+			location   	(1767, 324)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1256,7 +1315,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@6
-			    location   	(1776, 363)
+			    location   	(1767, 462)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -1364,7 +1423,7 @@
 			quidu      	"5A0B3A400372"
 			height     	118)
 		    (object UseCaseView "Use Case View::Créer compte pro" @11
-			location   	(501, 387)
+			location   	(252, 384)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1376,7 +1435,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@11
-			    location   	(501, 525)
+			    location   	(252, 522)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -1387,8 +1446,8 @@
 			fill_color 	13434879
 			quidu      	"5A098C8A0179"
 			height     	118)
-		    (object UseCaseView "Use Case View::Proposer ingrédients" @12
-			location   	(1422, 2025)
+		    (object UseCaseView "Use Case View::Sélectionner des ingrédients à proposer" @12
+			location   	(1389, 2001)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1400,18 +1459,18 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@12
-			    location   	(1422, 2288)
+			    location   	(1389, 2283)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
 			    justify    	0
-			    label      	"Proposer ingrédients")
+			    label      	"Sélectionner des ingrédients à proposer")
 			icon_style 	"Label"
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"5A098C7600D5"
-			width      	405
-			height     	367)
+			width      	471
+			height     	406)
 		    (object DependencyView "" @13
 			font       	(object Font
 			    size       	10
@@ -1424,7 +1483,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @14
 			    Parent_View 	@13
-			    location   	(1421, 2419)
+			    location   	(1409, 2430)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1448,10 +1507,10 @@
 			client     	@12
 			supplier   	@3
 			vertices   	(list Points
-			    (1418, 2312)
-			    (1419, 2551))
+			    (1399, 2331)
+			    (1414, 2552))
 			line_style 	0)
-		    (object UseCaseView "Use Case View::Updater commandes" @15
+		    (object UseCaseView "Use Case View::Définir état commandes" @15
 			location   	(1404, 1383)
 			font       	(object Font
 			    size       	10
@@ -1469,7 +1528,7 @@
 			    nlines     	2
 			    max_width  	630
 			    justify    	0
-			    label      	"Updater commandes")
+			    label      	"Définir état commandes")
 			icon_style 	"Label"
 			line_color 	3342489
 			fill_color 	13434879
@@ -1477,7 +1536,7 @@
 			width      	441
 			height     	368)
 		    (object UseCaseView "Use Case View::Gérer catalogue" @16
-			location   	(1386, 783)
+			location   	(1449, 828)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1489,7 +1548,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@16
-			    location   	(1386, 1028)
+			    location   	(1449, 1073)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -1532,7 +1591,7 @@
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$6" @18
-			location   	(366, 768)
+			location   	(245, 765)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1548,30 +1607,30 @@
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$7" @19
 				Parent_View 	@18
-				location   	(120, -387)
+				location   	(-1, -390)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098CA7016F"
 				client     	@18
 				supplier   	@11
 				vertices   	(list Points
-				    (366, 768)
-				    (441, 550))
+				    (245, 765)
+				    (248, 547))
 				line_style 	0)
 			    (object RoleView "$UNNAMED$8" @20
 				Parent_View 	@18
-				location   	(120, -387)
+				location   	(-1, -390)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098CA70171"
 				client     	@18
 				supplier   	@17
 				vertices   	(list Points
-				    (366, 768)
-				    (292, 986))
+				    (245, 765)
+				    (243, 984))
 				line_style 	0)))
 		    (object AssociationViewNew "$UNNAMED$12" @21
-			location   	(789, 1553)
+			location   	(758, 1531)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1587,26 +1646,26 @@
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$13" @22
 				Parent_View 	@21
-				location   	(543, 398)
+				location   	(512, 376)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098CB7031E"
 				client     	@21
 				supplier   	@12
 				vertices   	(list Points
-				    (789, 1553)
-				    (1220, 1869))
+				    (758, 1531)
+				    (1157, 1825))
 				line_style 	0)
 			    (object RoleView "$UNNAMED$14" @23
 				Parent_View 	@21
-				location   	(543, 398)
+				location   	(512, 376)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098CB70320"
 				client     	@21
 				supplier   	@17
 				vertices   	(list Points
-				    (789, 1553)
+				    (758, 1531)
 				    (359, 1238))
 				line_style 	0)))
 		    (object AssociationViewNew "$UNNAMED$42" @24
@@ -1649,7 +1708,7 @@
 				    (359, 1174))
 				line_style 	0)))
 		    (object AssociationViewNew "$UNNAMED$84" @27
-			location   	(760, 978)
+			location   	(793, 1000)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -1665,27 +1724,27 @@
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$85" @28
 				Parent_View 	@27
-				location   	(514, -177)
+				location   	(547, -155)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A0BF5A9026E"
 				client     	@27
 				supplier   	@16
 				vertices   	(list Points
-				    (760, 978)
-				    (1162, 848))
+				    (793, 1000)
+				    (1227, 881))
 				line_style 	0)
 			    (object RoleView "$UNNAMED$86" @29
 				Parent_View 	@27
-				location   	(514, -177)
+				location   	(547, -155)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A0BF5A90270"
 				client     	@27
 				supplier   	@17
 				vertices   	(list Points
-				    (760, 978)
-				    (359, 1109))
+				    (793, 1000)
+				    (359, 1120))
 				line_style 	0)))
 		    (object DependencyView "" @30
 			font       	(object Font
@@ -1699,7 +1758,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @31
 			    Parent_View 	@30
-			    location   	(1808, 690)
+			    location   	(1840, 710)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1723,8 +1782,8 @@
 			client     	@16
 			supplier   	@7
 			vertices   	(list Points
-			    (1605, 732)
-			    (2046, 651))
+			    (1668, 762)
+			    (2046, 660))
 			line_style 	0)
 		    (object DependencyView "" @32
 			font       	(object Font
@@ -1738,7 +1797,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @33
 			    Parent_View 	@32
-			    location   	(1592, 479)
+			    location   	(1612, 556)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1762,8 +1821,8 @@
 			client     	@16
 			supplier   	@6
 			vertices   	(list Points
-			    (1488, 624)
-			    (1661, 388))
+			    (1540, 669)
+			    (1661, 487))
 			line_style 	0)
 		    (object DependencyView "" @34
 			font       	(object Font
@@ -1777,7 +1836,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @35
 			    Parent_View 	@34
-			    location   	(1162, 493)
+			    location   	(1270, 565)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1801,8 +1860,8 @@
 			client     	@16
 			supplier   	@5
 			vertices   	(list Points
-			    (1300, 627)
-			    (1163, 367))
+			    (1380, 669)
+			    (1291, 463))
 			line_style 	0)
 		    (object DependencyView "" @36
 			font       	(object Font
@@ -1816,7 +1875,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @37
 			    Parent_View 	@36
-			    location   	(1958, 1674)
+			    location   	(1957, 1655)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1840,8 +1899,8 @@
 			client     	@4
 			supplier   	@12
 			vertices   	(list Points
-			    (2173, 1448)
-			    (1617, 1865))
+			    (2173, 1440)
+			    (1616, 1829))
 			line_style 	0)
 		    (object DependencyView "" @38
 			font       	(object Font
@@ -1855,7 +1914,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @39
 			    Parent_View 	@38
-			    location   	(1937, 1088)
+			    location   	(1966, 1109)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -1879,8 +1938,8 @@
 			client     	@4
 			supplier   	@16
 			vertices   	(list Points
-			    (2243, 1259)
-			    (1605, 897))
+			    (2241, 1258)
+			    (1668, 942))
 			line_style 	0)
 		    (object DependencyView "" @40
 			font       	(object Font
@@ -2272,7 +2331,7 @@
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$3" @58
-			location   	(5048, 1720)
+			location   	(5048, 1718)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -2288,27 +2347,27 @@
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$4" @59
 				Parent_View 	@58
-				location   	(1583, 520)
+				location   	(1583, 518)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098C0E0089"
 				client     	@58
 				supplier   	@42
 				vertices   	(list Points
-				    (5048, 1720)
+				    (5048, 1718)
 				    (5061, 1918))
 				line_style 	0)
 			    (object RoleView "$UNNAMED$5" @60
 				Parent_View 	@58
-				location   	(1583, 520)
+				location   	(1583, 518)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"5A098C0E008B"
 				client     	@58
 				supplier   	@57
 				vertices   	(list Points
-				    (5048, 1720)
-				    (5035, 1523))
+				    (5048, 1718)
+				    (5035, 1519))
 				line_style 	0)))
 		    (object AssociationViewNew "$UNNAMED$15" @61
 			location   	(4895, 827)
@@ -2517,7 +2576,7 @@
 			    default_color 	TRUE)
 			stereotype 	(object SegLabel @76
 			    Parent_View 	@75
-			    location   	(4241, 1758)
+			    location   	(4242, 1759)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
